@@ -1,7 +1,7 @@
 {
   "name": "hello-electron",
   "productName": "HelloElectron",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The smallest Electron app, used to learn the build and release pipeline",
   "main": "main.js",
   "author": "pritamsap",
