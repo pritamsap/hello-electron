@@ -1,0 +1,32 @@
+{
+  "name": "hello-electron",
+  "productName": "HelloElectron",
+  "version": "1.0.0",
+  "description": "The smallest Electron app, used to learn the build and release pipeline",
+  "main": "main.js",
+  "author": "pritamsap",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron-forge start",
+    "make": "electron-forge make"
+  },
+  "config": {
+    "forge": {
+      "makers": [
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin",
+            "win32",
+            "linux"
+          ]
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "8.0.1",
+    "@electron-forge/maker-zip": "8.0.1",
+    "electron": "45.2.1"
+  }
+}

@@ -1,0 +1,42 @@
+name: Build and release
+
+# When does the pipeline run?
+on:
+  push:
+    branches: [main]   # every push to main: build only
+    tags: ['v*']       # pushing a tag like v1.0.1: build AND publish a release
+  pull_request:        # every PR: build only, so broken code can't merge
+
+jobs:
+  build:
+    # Run the same steps on three machines at once (a "matrix").
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5            # get the code
+      - uses: actions/setup-node@v5          # install Node (version from .nvmrc)
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci                          # install exact versions from package-lock.json
+      - run: npm run make                    # build the app into a .zip for this OS
+      - uses: actions/upload-artifact@v4     # keep the .zip so the next job can use it
+        with:
+          name: app-${{ matrix.os }}
+          path: out/make/**/*.zip
+
+  release:
+    needs: build                             # only after all three builds pass
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write                        # allowed to create a GitHub Release
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - run: gh release create "$GITHUB_REF_NAME" $(find artifacts -name '*.zip') --repo "$GITHUB_REPOSITORY" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
